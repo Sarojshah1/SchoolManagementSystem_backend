@@ -3,14 +3,75 @@ const User=require("../model/User");
 const UserRouter = express.Router();
 
 UserRouter.post("/", async (req, res) => {
-    try {
-        const user = new User(req.body);
-        const savedUser = await user.save();
-        res.json(savedUser);
-      } catch (error) {
-        res.status(400).json({ message: error.message });
+  try {
+    const {
+      fullname,
+      phonenumber,
+      role,
+      subject,
+      gender,
+      className,
+      address,
+      dateofbirth,
+      password,
+    } = req.body;
+    const currentYear = new Date().getFullYear();
+    let counter = 1;
+
+    // Check if the generated username already exists
+    while (true) {
+      const username = `${currentYear}${counter.toString().padStart(3, "0")}`;
+      const existingUser = await User.findOne({ username });
+
+      if (!existingUser) {
+        break;
       }
+      counter++;
+    }
+
+    const newUser = new User({
+      fullname,
+      phonenumber,
+      role,
+      subject,
+      gender,
+      className,
+      address,
+      dateofbirth,
+      username: `teacher${currentYear}${counter.toString().padStart(3, "0")}`,
+      password,
+    });
+
+    await newUser.save();
+
+    res.json({
+      success: true,
+      message: "User created successfully",
+      user: newUser,
+    });
+  } catch (error) {
+    console.error(error);
+    if (
+      error.code === 11000 &&
+      error.keyPattern &&
+      error.keyValue &&
+      error.keyPattern.username === 1
+    ) {
+      res
+        .status(400)
+        .json({
+          success: false,
+          message: "Duplicate username. Please try again.",
+        });
+    } else {
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
+    }
+  }
 });
+
 
 UserRouter.get("/", async (req, res) => {
   try {
