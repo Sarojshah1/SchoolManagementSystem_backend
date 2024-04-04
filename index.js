@@ -10,7 +10,10 @@ const Attendancerouter = require("./routes/attendance");
 const Subjectrouter = require("./routes/subject");
 const Resultrouter = require("./routes/result");
 const Loginrouter = require("./routes/login");
+const TeacherLoginrouter = require("./routes/loginteacher");
 const StudentAttendancerouter = require("./routes/studentAttendance");
+const otprouter = require("./routes/otp");
+const verifyrouter = require("./routes/verifyotp");
 const app = express();
 const port = 7000;
 connectionmongoDB("mongodb://localhost:27017/SchoolManagement");
@@ -24,8 +27,10 @@ app.use("/update_routine/:id", router);
 app.use("/delete_routine/:id", router);
 // teacher auth
 app.use("/users", Userrouter);
+app.use("/user", TeacherLoginrouter);
+app.use("/users/login", TeacherLoginrouter );
 app.use("/Add_User", Userrouter);
-app.use("/update_User/:id", Userrouter);
+app.use("/update_User", Userrouter);
 app.use("/delete_User/:id", Userrouter);
 
 // Student Auth
@@ -48,6 +53,7 @@ app.use("/delete_Fee/:id", Feerouter);
 
 // add subject api
 app.use("/Add_Subject", Subjectrouter);
+app.use("/Subjects", Subjectrouter);
 
 
 // Payment api
@@ -79,10 +85,8 @@ app.use("/Add_marks", Resultrouter);
 app.use("/results", Resultrouter);
 app.use("/result/:studentId", Resultrouter);
 
-// // Error handling middleware
-// app.use((err, req, res, next) => {
-//   console.error(err.stack);
-//   res.status(500).json({ success: false, message: "Internal server error" });
-// });
+app.use("/otp", otprouter);
+app.use("/verify", verifyrouter);
+
 
 app.listen(port, () => console.log(`Starting app at ${port}`));

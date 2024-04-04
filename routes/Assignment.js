@@ -33,21 +33,24 @@ Assignmentrouter.get('/', async (req, res) => {
 
 // Create a new assignment
 Assignmentrouter.post('/', async (req, res) => {
-  const assignment = new Assignment({
-    subject: req.body.subject,
-    teacher: req.body.teacher,
-    title: req.body.title,
-    description: req.body.description,
-    dueDate: req.body.dueDate,
-    className: req.body.className, // Add class field
-  });
+  const { subject, teacherId, title, description, dueDate, className } = req.body;
 
   try {
+    const assignment = new Assignment({
+      subject,
+      teacherId,
+      title,
+      description,
+      dueDate,
+      className,
+    });
+
     const newAssignment = await assignment.save();
     res.status(201).json(newAssignment);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
+
 
 module.exports = Assignmentrouter;

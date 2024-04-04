@@ -5,7 +5,6 @@ const markSchema = new mongoose.Schema({
   subjectId: { type: mongoose.Schema.Types.ObjectId, ref: "Subject" },
   term: Number,
   marks: Number,
-  // Add more fields as needed
 });
 
 const Mark = mongoose.model("Mark", markSchema);

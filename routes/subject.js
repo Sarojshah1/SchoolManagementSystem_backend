@@ -11,6 +11,13 @@ SubjectRouter.post("/", async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
-
+SubjectRouter.get("/", async (req, res) => {
+  try {
+    const subjects = await Subject.find();
+    res.json(subjects);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 module.exports = SubjectRouter;

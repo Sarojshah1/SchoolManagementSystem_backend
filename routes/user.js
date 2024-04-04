@@ -76,17 +76,19 @@ UserRouter.post("/", async (req, res) => {
 UserRouter.get("/", async (req, res) => {
   try {
     const data = await User.find();
-    res.json(data);
+    res.json({user: data});
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-UserRouter.put("/", async (req, res) => {
+UserRouter.put("/:username", async (req, res) => {
   try {
-    const updatedData = await User.findByIdAndUpdate(
-      req.params.id,
-      req.body,
+    const { username } = req.params;
+    const {new_password}=req.body; // Extract username from the request parameters
+    const updatedData = await User.findOneAndUpdate(
+      { username: username }, 
+      { password: new_password },// Find user by username
       { new: true }
     );
     res.json(updatedData);
