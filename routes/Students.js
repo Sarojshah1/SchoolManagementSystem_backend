@@ -82,11 +82,15 @@ StudentRouter.post("/", async (req, res) => {
   }
 });
 
-StudentRouter.put("/", async (req, res) => {
+StudentRouter.put("/:username", async (req, res) => {
   try {
-    const updatedData = await Student.findByIdAndUpdate(
-      req.params.id,
-      req.body,
+    const { username } = req.params;
+    console.log(username);
+    const {new_password}=req.body;
+    console.log(new_password);
+    const updatedData = await User.findOneAndUpdate(
+      { username: username }, 
+      { password: new_password },// Find user by username
       { new: true }
     );
     res.json(updatedData);

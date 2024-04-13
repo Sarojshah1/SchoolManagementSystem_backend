@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const { connectionmongoDB } = require("./connection");
 const router = require("./routes/routine");
@@ -14,11 +15,25 @@ const TeacherLoginrouter = require("./routes/loginteacher");
 const StudentAttendancerouter = require("./routes/studentAttendance");
 const otprouter = require("./routes/otp");
 const verifyrouter = require("./routes/verifyotp");
+const pushNotificationRoute = require("./routes/notifications");
+const http = require("http");
+const WebSocket = require("ws");
+
+
 const app = express();
-const port = 7000;
-connectionmongoDB("mongodb://localhost:27017/SchoolManagement");
+const port = process.env.PORT || 7000;
+connectionmongoDB("mongodb+srv://sarojshah2326:QZWUpIUWjztdYNiO@cluster0.bxqxhex.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0");
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+wss.on("connection", function connection(ws) {
+    ws.on("message", function incoming(message) {
+        console.log("Received: %s", message);
+    });
+
+    ws.send("Connected to push notification server");
+});
 // routine api
 app.use("/routine", router);
 app.use("/routine/:day", router);
@@ -39,7 +54,7 @@ app.use("/Students", Studentrouter);
 app.use("/Student", Loginrouter);
 app.use("/Student/login", Loginrouter);
 app.use("/Add_Students", Studentrouter);
-app.use("/update_Students/:id", Studentrouter);
+app.use("/update_Students", Studentrouter);
 app.use("/delete_Students/:id", Studentrouter);
 
 // Fees api
@@ -87,6 +102,19 @@ app.use("/result/:studentId", Resultrouter);
 
 app.use("/otp", otprouter);
 app.use("/verify", verifyrouter);
+// app.use("/send-notification", pushNotificationRoute);
+app.post("/send-notification", (req, res) => {
+    const { message } = req.body;
+
+    wss.clients.forEach(function each(client) {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(message);
+        }
+    });
+
+    res.status(200).send("Notification sent successfully");
+});
+
 
 
 app.listen(port, () => console.log(`Starting app at ${port}`));
