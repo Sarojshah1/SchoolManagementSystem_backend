@@ -20,7 +20,7 @@ UserRouter.post("/", async (req, res) => {
 
     // Check if the generated username already exists
     while (true) {
-      const username = `${currentYear}${counter.toString().padStart(3, "0")}`;
+      const username = `teacher${currentYear}${counter.toString().padStart(3, "0")}`;
       const existingUser = await User.findOne({ username });
 
       if (!existingUser) {
